@@ -6,3 +6,13 @@ body {
 a {
   color: #00B7FF;
 }
+
+label, .label {
+  display: block;
+  margin: 20px;
+}
+
+input[type=radio] {
+  float: left;
+  margin-right: 10px;
+}

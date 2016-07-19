@@ -2,4 +2,16 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Fortuna wymaga poświęceń. Wypełnij dokładnie okienka poniżej.
+  form#report-form
+    label Nazwa użytkownika na Bitbuckecie
+      input#username(type='text', name='username')
+    p.label
+    label Flipbook Html
+      input.repositories(type='radio', name='repositories', value='flipbook-html,vanilia-player,kredens,kredens-player-event-emitter')
+    label Didactus
+      input.repositories(type='radio', name='repositories', value='didactus-spa,didactus-spa-student,didactus-spa-teacher')
+    input(type='submit', value='Rób')
+
+    p Current status:
+      span#status  bezczynny
