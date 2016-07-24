@@ -6,6 +6,7 @@ const EventEmitter = require('events');
 class ReportGenerator extends EventEmitter {
 
 	constructor(username, repositoryNames) {
+		super();
 		this.username = username;
 		this.repositoryNames = repositoryNames;
 		this.progressPerRepo = 1 / repositoryNames.length;
@@ -29,7 +30,7 @@ class ReportGenerator extends EventEmitter {
 	}
 
 	getPullRequests(repositoryName) {
-		driller.getPullRequestsByUser(this.username, repositoryName).then((pullRequests) => {
+		return driller.getPullRequestsByUser(this.username, repositoryName).then((pullRequests) => {
 			console.log(`${this.username} in ${repositoryName} has a following pull requests:
 ${pullRequests.map((pr) => `* ${pr.title} (${pr.state})`).join(',\n')}`);
 			this.progress += this.progressPerRepo;
