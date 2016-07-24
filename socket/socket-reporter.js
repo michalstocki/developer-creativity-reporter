@@ -1,7 +1,6 @@
 'use strict';
 
-const ReportGenerator = require('../main/report-generator');
-const driller = require('./../main/bitbucket-pullrequest-driller');
+const PullRequestListProvider = require('../main/pull-request-list-provider');
 
 module.exports = function(server) {
 
@@ -9,11 +8,13 @@ module.exports = function(server) {
 
 	io.on('connection', function(socket) {
 		socket.on('get-report', function(data) {
-			const reportGenerator = new ReportGenerator(data.username, data.repositories);
-			reportGenerator.on('report-progress', (progress) => {
+			const pullRequestListProvider = new PullRequestListProvider(data.username, data.repositories);
+			pullRequestListProvider.on('report-progress', (progress) => {
 				socket.emit('drilling-bitbucket-progress', {progress: progress});
 			});
-			reportGenerator.generateCSV().then(() => {
+			pullRequestListProvider.getPullRequestList().then((pullRequests) => {
+				console.log(`${data.username} has a following pull requests:
+${pullRequests.map((pr) => `* ${pr.destination.repository.name}: ${pr.title} (${pr.state})`).join(',\n')}`);
 				console.log('Report generated!');
 			});
 		});
