@@ -14,7 +14,7 @@ class PullRequestListProvider extends EventEmitter {
 	}
 
 	getPullRequestList() {
-		let lastPromise = new Promise((resolve => resolve()));
+		let lastPromise = Promise.resolve();
 		this.repositoryNames.forEach((repositoryName) => {
 			lastPromise = lastPromise.then(() => {
 				return this.getPullRequests(repositoryName);
