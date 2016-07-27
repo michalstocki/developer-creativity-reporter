@@ -1,6 +1,7 @@
 'use strict';
 
 const PullRequestListProvider = require('../main/pull-request-list-provider');
+const generator = require('../main/report/report-generator');
 
 module.exports = function(server) {
 
@@ -14,9 +15,7 @@ module.exports = function(server) {
 			});
 			pullRequestListProvider.on('error', (error) => socket.emit('warning', {info: error}));
 			pullRequestListProvider.getPullRequestList().then((pullRequests) => {
-				console.log(`${data.username} has a following pull requests:
-${pullRequests.map((pr) => `* ${pr.destination.repository.name}: ${pr.title} (${pr.state})`).join(',\n')}`);
-
+				generator.generateReport(data, pullRequests);
 				console.log('Report generated!');
 			}).catch((error) => {
 				console.log('Report not generated', error);
