@@ -8,7 +8,11 @@ module.exports.getPullRequestsByUser = function(username, repositoryName) {
 			'Authorization': createBasicAuthHeader(config.bitbucketUser, config.bitbucketPass)
 		}
 	}).then((response) => {
-		return response.json();
+		if (response.status >= 200 && response.status < 300) {
+			return response.json();
+		} else {
+			return Promise.reject(`Status ${response.status} (${response.statusText})`);
+		}
 	}).then((json) => {
 		return filterPullRequestsByUser(username, json.values);
 	});

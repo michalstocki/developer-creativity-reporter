@@ -17,23 +17,35 @@ class PullRequestListProvider extends EventEmitter {
 		let lastPromise = Promise.resolve();
 		this.repositoryNames.forEach((repositoryName) => {
 			lastPromise = lastPromise.then(() => {
-				return this.getPullRequests(repositoryName);
+				return this._getPullRequests(repositoryName);
 			}).catch((error) => {
-				console.error(`Error while fetching data from ${repositoryName}:`, error);
-				return this.getPullRequests(repositoryName);
+				this.emit('error', `Error while fetching data from ${repositoryName}: ${error}`);
+				return this._getPullRequests(repositoryName);
 			});
 		});
-		return lastPromise.then(() => {
-			return this.pullRequestsData;
-		});
+		return lastPromise.then(() => this._finish()).catch(() => this._finish());
 	}
 
-	getPullRequests(repositoryName) {
+	_getPullRequests(repositoryName) {
 		return bitbucketClient.getPullRequestsByUser(this.username, repositoryName).then((pullRequests) => {
 			[].push.apply(this.pullRequestsData, pullRequests);
 			this.progress += this.progressPerRepo;
 			this.emit('report-progress', this.progress);
 		});
+	}
+
+	_finish() {
+		if (this.pullRequestsData.length > 0) {
+			return this.pullRequestsData;
+		} else {
+			return this._fail();
+		}
+	}
+
+	_fail() {
+		return Promise.reject(`No pull requests for given criteria: 
+	user: ${this.username},
+	repositories: ${this.repositoryNames.join(', ')}.`);
 	}
 
 }

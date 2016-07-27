@@ -28,3 +28,11 @@ function setStatus(text) {
 socket.on('drilling-bitbucket-progress', function (data) {
 	setStatus('Zaciąganie danych o pull requestach z Bitbucketa: ' + (data.progress * 100) + '%')
 });
+
+socket.on('fail', function(error) {
+	console.error(error.info);
+});
+
+socket.on('warning', function(warn) {
+	console.warn(warn.info);
+});

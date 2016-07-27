@@ -12,10 +12,15 @@ module.exports = function(server) {
 			pullRequestListProvider.on('report-progress', (progress) => {
 				socket.emit('drilling-bitbucket-progress', {progress: progress});
 			});
+			pullRequestListProvider.on('error', (error) => socket.emit('warning', {info: error}));
 			pullRequestListProvider.getPullRequestList().then((pullRequests) => {
 				console.log(`${data.username} has a following pull requests:
 ${pullRequests.map((pr) => `* ${pr.destination.repository.name}: ${pr.title} (${pr.state})`).join(',\n')}`);
+
 				console.log('Report generated!');
+			}).catch((error) => {
+				console.log('Report not generated', error);
+				socket.emit('fail', {info: error});
 			});
 		});
 	});
