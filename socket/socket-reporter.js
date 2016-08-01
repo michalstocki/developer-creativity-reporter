@@ -2,6 +2,7 @@
 
 const PullRequestListProvider = require('../main/pull-request-list-provider');
 const generator = require('../main/report/report-generator');
+const writer = require('../main/write-file');
 
 module.exports = function(server) {
 
@@ -15,8 +16,10 @@ module.exports = function(server) {
 			});
 			pullRequestListProvider.on('error', (error) => socket.emit('warning', {info: error}));
 			pullRequestListProvider.getPullRequestList().then((pullRequests) => {
-				generator.generateReport(data, pullRequests);
+				return generator.generateReport(data, pullRequests);
+			}).then((report) => {
 				console.log('Report generated!');
+				return writer.writeFile(`tmp/${Date.now()}-report.csv`, report);
 			}).catch((error) => {
 				console.log('Report not generated', error);
 				socket.emit('fail', {info: error});
