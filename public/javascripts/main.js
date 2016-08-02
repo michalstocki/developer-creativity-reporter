@@ -9,11 +9,13 @@ form.addEventListener("submit", (event) => {
 
 function getFormData() {
 	var username = document.getElementById('username').value;
+	var position = document.getElementById('position').value;
 	var projectRadioInputs = [].slice.call(document.getElementsByClassName('repositories'));
 	var repositoryList = projectRadioInputs.filter(input => input.checked)[0].value;
 	return {
 		username: username,
-		repositories: repositoryList.split(',')
+		repositories: repositoryList.split(','),
+		position: position
 	}
 }
 

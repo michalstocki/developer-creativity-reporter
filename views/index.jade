@@ -11,6 +11,11 @@ block content
       input.repositories(type='radio', name='repositories', value='flipbook-html,vanilia-player,kredens,kredens-player-event-emitter')
     label Didactus
       input.repositories(type='radio', name='repositories', value='didactus-spa,didactus-spa-student,didactus-spa-teacher')
+    label.position Stanowisko
+      select#position(name='position')
+        option(value='developer') Programista
+        option(value='tester') Tester
+        option(value='manager') Kierownik zespołu
     input(type='submit', value='Rób')
 
     p Current status:
