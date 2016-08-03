@@ -7,6 +7,7 @@ class PullRequestListProvider extends EventEmitter {
 
 	constructor(username, repositoryNames) {
 		super();
+		this.progress = 0;
 		this.username = username;
 		this.repositoryNames = repositoryNames;
 		this.progressPerRepo = 1 / repositoryNames.length;
