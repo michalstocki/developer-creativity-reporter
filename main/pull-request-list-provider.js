@@ -2,16 +2,23 @@
 
 const bitbucketClient = require('./bitbucket-api-client');
 const EventEmitter = require('events');
+const moment = require('moment');
 
 class PullRequestListProvider extends EventEmitter {
 
 	constructor(username, repositoryNames) {
 		super();
 		this.progress = 0;
-		this.username = username;
 		this.repositoryNames = repositoryNames;
 		this.progressPerRepo = 1 / repositoryNames.length;
 		this.pullRequestsData = [];
+		this.filters = {
+			username: username,
+			period: {
+				from: moment().startOf('month'),
+				to: moment().endOf('month')
+			}
+		}
 	}
 
 	getPullRequestList() {
@@ -28,7 +35,7 @@ class PullRequestListProvider extends EventEmitter {
 	}
 
 	_getPullRequests(repositoryName) {
-		return bitbucketClient.getPullRequestsByUser(this.username, repositoryName).then((pullRequests) => {
+		return bitbucketClient.getFilteredPullRequests(repositoryName, this.filters).then((pullRequests) => {
 			[].push.apply(this.pullRequestsData, pullRequests);
 			this.progress += this.progressPerRepo;
 			this.emit('report-progress', this.progress);
@@ -45,8 +52,9 @@ class PullRequestListProvider extends EventEmitter {
 
 	_fail() {
 		return Promise.reject(`No pull requests for given criteria: 
-	user: ${this.username},
-	repositories: ${this.repositoryNames.join(', ')}.`);
+	user: ${this.filters.username},
+	repositories: ${this.repositoryNames.join(', ')},
+	period: from ${this.filters.period.from} to ${this.filters.period.to}.`);
 	}
 
 }
