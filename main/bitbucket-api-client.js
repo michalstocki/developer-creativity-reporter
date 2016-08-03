@@ -1,29 +1,32 @@
 const config = require('../config.json');
 const createBasicAuthHeader = require('basic-auth-header');
 const moment = require('moment');
+const fetch = require('node-fetch');
 
-module.exports.getFilteredPullRequests = function(repositoryName, filters) {
-	const fetch = require('node-fetch');
-	let promise = fetch(`https://api.bitbucket.org/2.0/repositories/ydp/${repositoryName}/pullrequests?state=MERGED&state=OPEN`, {
+function getFilteredPullRequests(repositoryName, filters) {
+	return fetchPullRequests(repositoryName)
+		.then(checkResponseStatus)
+		.then(json => json.values)
+		.then(pullRequests => filterPullRequests(pullRequests, filters));
+}
+
+function fetchPullRequests(repositoryName) {
+	return fetch(`https://api.bitbucket.org/2.0/repositories/ydp/${repositoryName}/pullrequests?state=MERGED&state=OPEN`, {
 		headers: {
 			'Authorization': createBasicAuthHeader(config.bitbucketUser, config.bitbucketPass)
 		}
-	}).then(checkResponseStatus).then(json => json.values);
-	
-	if (filters.username) {
-		promise = promise.then((pullRequests) => {
-			return filterPullRequestsByUser(pullRequests, filters.username);
-		});
-	}
-	
-	if (filters.period) {
-		promise = promise.then((pullRequests) => {
-			return filterPullRequestsByPeriod(pullRequests, filters.period)
-		});
-	}
+	});
+}
 
-	return promise;
-};
+function filterPullRequests(pullRequests, filters) {
+	if (filters.username) {
+		pullRequests = filterPullRequestsByUser(pullRequests, filters.username);
+	}
+	if (filters.period) {
+		pullRequests = filterPullRequestsByPeriod(pullRequests, filters.period);
+	}
+	return pullRequests;
+}
 
 function checkResponseStatus(response) {
 	if (response.status >= 200 && response.status < 300) {
@@ -40,3 +43,5 @@ function filterPullRequestsByUser(pullRequests, username) {
 function filterPullRequestsByPeriod(pullRequests, period) {
 	return pullRequests.filter(pullRequest => moment(pullRequest.created_on).isBetween(period.from, period.to));
 }
+
+module.exports.getFilteredPullRequests = getFilteredPullRequests;
