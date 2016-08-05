@@ -1,3 +1,7 @@
+var local = new Date();
+local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+document.getElementById('month').value = local.toJSON().slice(0,7);
+
 var socket = io.connect(document.location.href);
 var form = document.getElementById('report-form');
 form.addEventListener("submit", (event) => {
@@ -10,12 +14,14 @@ form.addEventListener("submit", (event) => {
 function getFormData() {
 	var username = document.getElementById('username').value;
 	var position = document.getElementById('position').value;
+	var date = document.getElementById('month').value;
 	var projectRadioInputs = [].slice.call(document.getElementsByClassName('repositories'));
 	var repositoryList = projectRadioInputs.filter(input => input.checked)[0].value;
 	return {
 		username: username,
 		repositories: repositoryList.split(','),
-		position: position
+		position: position,
+		month: date
 	}
 }
 

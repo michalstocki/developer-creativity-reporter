@@ -16,3 +16,8 @@ input[type=radio] {
   float: left;
   margin-right: 10px;
 }
+
+input, select {
+  margin-left: 10px;
+  font-family: sans-serif;
+}

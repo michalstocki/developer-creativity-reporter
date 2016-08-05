@@ -6,19 +6,19 @@ const moment = require('moment');
 
 class PullRequestListProvider extends EventEmitter {
 
-	constructor(username, repositoryNames) {
+	constructor(data) {
 		super();
 		this.progress = 0;
-		this.repositoryNames = repositoryNames;
-		this.progressPerRepo = 1 / repositoryNames.length;
+		this.repositoryNames = data.repositories;
+		this.progressPerRepo = 1 / data.repositories.length;
 		this.pullRequestsData = [];
 		this.filters = {
-			username: username,
+			username: data.username,
 			period: {
-				from: moment().startOf('month'),
-				to: moment().endOf('month')
+				from: moment(data.month, 'YYYY-MM').startOf('month'),
+				to: moment(data.month, 'YYYY-MM').endOf('month')
 			}
-		}
+		};
 	}
 
 	getPullRequestList() {

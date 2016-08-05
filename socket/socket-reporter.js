@@ -10,7 +10,7 @@ module.exports = function(server) {
 
 	io.on('connection', function(socket) {
 		socket.on('get-report', function(data) {
-			const pullRequestListProvider = new PullRequestListProvider(data.username, data.repositories);
+			const pullRequestListProvider = new PullRequestListProvider(data);
 			pullRequestListProvider.on('report-progress', (progress) => {
 				socket.emit('drilling-bitbucket-progress', {progress: progress});
 			});
