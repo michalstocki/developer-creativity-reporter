@@ -27,8 +27,6 @@ function fetchPullRequestsObject(bitbucketAPIURL) {
 }
 
 function loadNextPage(pullRequestsObject, filters) {
-	console.log('pullRequestsObject length', pullRequestsObject.values[0].destination.repository.name,
-		pullRequestsObject.values.length);
 	let nextPageData = pullRequestsObject;
 	if (pullRequestsObject.next && canNextPageSatisfyFilter(pullRequestsObject, filters)) {
 		nextPageData = fetchPullRequestsObject(pullRequestsObject.next).then(prObject => {
@@ -42,7 +40,7 @@ function loadNextPage(pullRequestsObject, filters) {
 function canNextPageSatisfyFilter(pullRequestObject, filters) {
 	let result = true;
 	const lastResult = pullRequestObject.values[pullRequestObject.values.length - 1];
-	if (filters.period && moment(lastResult.created_on).isAfter(filters.period.to)) {
+	if (filters.period && moment(lastResult.created_on).isBefore(filters.period.from)) {
 		result = false;
 	}
 	return result;
