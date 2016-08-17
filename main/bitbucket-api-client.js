@@ -8,7 +8,8 @@ module.exports.getFilteredPullRequests = function(repositoryName, filters) {
 };
 
 function getRequestUrl(repositoryName) {
-	return `https://api.bitbucket.org/2.0/repositories/ydp/${repositoryName}/pullrequests?state=MERGED&state=OPEN`;
+	const teamName = config.bitbucket.team;
+	return `https://api.bitbucket.org/2.0/repositories/${teamName}/${repositoryName}/pullrequests?state=MERGED&state=OPEN`;
 }
 
 function fetchFilteredPullRequests(apiURL, filters) {
@@ -21,7 +22,7 @@ function fetchFilteredPullRequests(apiURL, filters) {
 function fetchPullRequestsObject(bitbucketAPIURL) {
 	return fetch(bitbucketAPIURL, {
 		headers: {
-			'Authorization': createBasicAuthHeader(config.bitbucketUser, config.bitbucketPass)
+			'Authorization': createBasicAuthHeader(config.bitbucket.access.user, config.bitbucket.access.password)
 		}
 	}).then(checkResponseStatus);
 }

@@ -1,0 +1,9 @@
+{
+  "bitbucket": {
+    "team": "team-name",
+    "access": {
+      "user": "username",
+      "password": "password"
+    }
+  }
+}
