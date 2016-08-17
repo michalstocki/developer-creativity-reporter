@@ -43,8 +43,8 @@ socket.on('report-file', function(event) {
 	a.click();
 });
 
-socket.on('drilling-bitbucket-progress', function (data) {
-	setStatus('Zaciąganie danych o pull requestach z Bitbucketa: ' + (data.progress * 100) + '%')
+socket.on('progress', function (progress) {
+	setStatus((progress.value * 100) + '% ' + progress.state)
 });
 
 socket.on('fail', function(error) {

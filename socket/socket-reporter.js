@@ -1,9 +1,6 @@
 'use strict';
 
-const PullRequestListProvider = require('../main/pull-request-list-provider');
-const generator = require('../main/report/report-generator');
-const writer = require('../main/write-file');
-const fs = require('fs');
+const ForutnaReportGenerator = require('../main/fortuna-report-generator');
 
 module.exports = function(server) {
 
@@ -11,22 +8,12 @@ module.exports = function(server) {
 
 	io.on('connection', function(socket) {
 		socket.on('get-report', function(data) {
-			const pullRequestListProvider = new PullRequestListProvider(data);
-			pullRequestListProvider.on('report-progress', (progress) => {
-				socket.emit('drilling-bitbucket-progress', {progress: progress});
-			});
-			pullRequestListProvider.on('error', (error) => socket.emit('warning', {info: error}));
-			const reportFilename = `${Date.now()}-${data.username}-report.csv`;
-			const reportFilePath = `tmp/${reportFilename}`;
-			pullRequestListProvider.getPullRequestList().then((pullRequests) => {
-				return generator.generateReport(data, pullRequests);
-			}).then((report) => {
-				console.log('Report generated!');
-				return writer.writeFile(reportFilePath, report);
-			}).then(() => {
-				fs.readFile(reportFilePath, function(err, buf){
-					socket.emit('report-file', { buffer: buf, filename: reportFilename });
-				});
+			const reportGenerator = new ForutnaReportGenerator(data);
+			reportGenerator.on('progress', (progress) => socket.emit('progress', progress));
+			reportGenerator.on('warning', (warning) => socket.emit('warning', warning));
+			const reportFilename = `fortuna-report-${data.username}-${Date.now()}.csv`;
+			reportGenerator.generateCSVReportFile().then((fileBuffer) => {
+				socket.emit('report-file', {buffer: fileBuffer, filename: reportFilename});
 			}).catch((error) => {
 				console.log('Report not generated', error);
 				socket.emit('fail', {info: error});

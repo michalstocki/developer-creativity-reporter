@@ -4,7 +4,7 @@ const footer = require('./template/footer');
 const moment = require('moment');
 const getUserInfo = require('./user-info-provider').getUserInfo;
 
-module.exports.generateReport = function(inputData, pullRequests) {
+module.exports.generateCSVReportContents = function(inputData, pullRequests) {
 	moment.locale('pl');
 
 	return getUserInfo(inputData, pullRequests).then((user) => {
