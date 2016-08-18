@@ -11,6 +11,10 @@ module.exports.getProjects = function() {
 	return fetchCollection(getProjectsAPIUrl());
 };
 
+module.exports.getRepositoriesByProject = function(projectKey) {
+	return fetchCollection(getProjectRepositoriesAPIUrl(projectKey));
+};
+
 function getPullRequestsAPIUrl(repositoryName) {
 	const teamName = config.bitbucket.team;
 	return `https://api.bitbucket.org/2.0/repositories/${teamName}/${repositoryName}/pullrequests?state=MERGED&state=OPEN`;
@@ -18,6 +22,11 @@ function getPullRequestsAPIUrl(repositoryName) {
 
 function getProjectsAPIUrl() {
 	return `https://api.bitbucket.org/2.0/teams/${config.bitbucket.team}/projects/`;
+}
+
+function getProjectRepositoriesAPIUrl(projectKey) {
+	const query = encodeURIComponent(`project.key="${projectKey}"`);
+	return `https://api.bitbucket.org/2.0/repositories/ydp?q=${query}`;
 }
 
 function fetchCollection(apiURL) {

@@ -15,7 +15,7 @@ function getFormData() {
 	var username = document.getElementById('username').value;
 	var position = document.getElementById('position').value;
 	var date = document.getElementById('month').value;
-	var projects = [].filter.call(document.getElementsByName('projects'), function(c) {
+	var projects = [].filter.call(document.getElementsByName('project'), function(c) {
 		return c.checked;
 	}).map(function(c) {
 		return c.value;
@@ -47,7 +47,7 @@ socket.on('report-file', function(event) {
 });
 
 socket.on('progress', function(progress) {
-	setStatus((progress.value * 100) + '% ' + progress.state)
+	setStatus(Math.round(progress.value * 100) + '% ' + progress.state)
 });
 
 socket.on('fail', function(error) {

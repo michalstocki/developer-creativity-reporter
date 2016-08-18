@@ -9,8 +9,6 @@ class PullRequestListProvider extends EventEmitter {
 	constructor(data) {
 		super();
 		this.progress = 0;
-		this.repositoryNames = data.repositories;
-		this.progressPerRepo = 1 / data.repositories.length;
 		this.pullRequestsData = [];
 		this.filters = {
 			username: data.username,
@@ -21,7 +19,9 @@ class PullRequestListProvider extends EventEmitter {
 		};
 	}
 
-	getPullRequestList() {
+	getPullRequestList(repositoryNames) {
+		this.repositoryNames = repositoryNames;
+		this.progressPerRepo = 1 / this.repositoryNames.length;
 		let lastPromise = Promise.resolve();
 		this.repositoryNames.forEach((repositoryName) => {
 			lastPromise = lastPromise.then(() => {
