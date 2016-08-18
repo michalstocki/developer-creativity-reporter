@@ -5,7 +5,7 @@ block content
   p Fortuna wymaga poświęceń. Wypełnij dokładnie okienka poniżej.
   form#report-form
     label Nazwa użytkownika na Bitbuckecie
-      input#username(type='text', name='username')
+      input#username(required type='text', name='username')
     p.label Projekty
     each project in projects
       label.project

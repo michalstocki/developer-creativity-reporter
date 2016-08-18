@@ -19,7 +19,10 @@ input[type=radio] {
 
 input, select {
   margin-left: 10px;
-  font-family: sans-serif;
+}
+
+input, select, select option, button {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 label.project .avatar {
