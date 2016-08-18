@@ -4,22 +4,36 @@ const moment = require('moment');
 const fetch = require('node-fetch');
 
 module.exports.getFilteredPullRequests = function(repositoryName, filters) {
-	return fetchFilteredPullRequests(getRequestUrl(repositoryName), filters);
+	return fetchFilteredPullRequests(getPullRequestsAPIUrl(repositoryName), filters);
 };
 
-function getRequestUrl(repositoryName) {
+module.exports.getProjects = function() {
+	return fetchCollection(getProjectsAPIUrl());
+};
+
+function getPullRequestsAPIUrl(repositoryName) {
 	const teamName = config.bitbucket.team;
 	return `https://api.bitbucket.org/2.0/repositories/${teamName}/${repositoryName}/pullrequests?state=MERGED&state=OPEN`;
 }
 
+function getProjectsAPIUrl() {
+	return `https://api.bitbucket.org/2.0/teams/${config.bitbucket.team}/projects/`;
+}
+
+function fetchCollection(apiURL) {
+	return fetchBitbucketAPI(apiURL)
+		.then(responseObject => loadNextPage(responseObject))
+		.then(responseObject => responseObject.values)
+}
+
 function fetchFilteredPullRequests(apiURL, filters) {
-	return fetchPullRequestsObject(apiURL)
-		.then(pullRequestsObject => loadNextPage(pullRequestsObject, filters))
-		.then(pullRequestsObject => pullRequestsObject.values)
+	return fetchBitbucketAPI(apiURL)
+		.then(responseObject => loadNextPage(responseObject, filters))
+		.then(responseObject => responseObject.values)
 		.then(pullRequests => filterPullRequests(pullRequests, filters));
 }
 
-function fetchPullRequestsObject(bitbucketAPIURL) {
+function fetchBitbucketAPI(bitbucketAPIURL) {
 	return fetch(bitbucketAPIURL, {
 		headers: {
 			'Authorization': createBasicAuthHeader(config.bitbucket.access.user, config.bitbucket.access.password)
@@ -27,12 +41,12 @@ function fetchPullRequestsObject(bitbucketAPIURL) {
 	}).then(checkResponseStatus);
 }
 
-function loadNextPage(pullRequestsObject, filters) {
-	let nextPageData = pullRequestsObject;
-	if (pullRequestsObject.next && canNextPageSatisfyFilter(pullRequestsObject, filters)) {
-		nextPageData = fetchPullRequestsObject(pullRequestsObject.next).then(prObject => {
-			[].unshift.apply(prObject.values, pullRequestsObject.values);
-			return loadNextPage(prObject, filters);
+function loadNextPage(responseObject, filters) {
+	let nextPageData = responseObject;
+	if (responseObject.next && canNextPageSatisfyFilter(responseObject, filters)) {
+		nextPageData = fetchBitbucketAPI(responseObject.next).then(resObject => {
+			[].unshift.apply(resObject.values, responseObject.values);
+			return loadNextPage(resObject, filters);
 		});
 	}
 	return nextPageData;
@@ -41,7 +55,7 @@ function loadNextPage(pullRequestsObject, filters) {
 function canNextPageSatisfyFilter(pullRequestObject, filters) {
 	let result = true;
 	const lastResult = pullRequestObject.values[pullRequestObject.values.length - 1];
-	if (filters.period && moment(lastResult.created_on).isBefore(filters.period.from)) {
+	if (filters && filters.period && moment(lastResult.created_on).isBefore(filters.period.from)) {
 		result = false;
 	}
 	return result;

@@ -6,11 +6,14 @@ block content
   form#report-form
     label Nazwa użytkownika na Bitbuckecie
       input#username(type='text', name='username')
-    p.label
-    label Flipbook Html
-      input.repositories(type='radio', name='repositories', value='flipbook-html,vanilia-player,kredens,kredens-player-event-emitter')
-    label Didactus
-      input.repositories(type='radio', name='repositories', value='didactus-spa,didactus-spa-student,didactus-spa-teacher')
+    p.label Projekty
+    each project in projects
+      label.project
+        input(type='checkbox', name='project', value=project.key)
+        span.avatar
+          img(src=(project.links.avatar.href) alt=project.name)
+        span.name
+          = project.name
     label Miesiąc
       input#month(type='month', name='month')
     label.position Stanowisko

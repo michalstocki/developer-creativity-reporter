@@ -21,3 +21,40 @@ input, select {
   margin-left: 10px;
   font-family: sans-serif;
 }
+
+label.project .avatar {
+  display: inline-block;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  border: 1px solid lightgray;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+label.project input {
+  display: none;
+}
+
+label.project input:checked + .avatar {
+  border: 2px solid darkgreen;
+  width: 30px;
+  height: 30px;
+}
+
+label.project .avatar img {
+  width: 32px;
+  height: 32px;
+  opacity: 0.4;
+}
+
+label.project input:checked + .avatar img {
+  margin-top: -1px;
+  margin-left: -1px;
+  opacity: 1;
+}
+
+label.project input:checked + .avatar + .name {
+  font-weight: bold;
+}

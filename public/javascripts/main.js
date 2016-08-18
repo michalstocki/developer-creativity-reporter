@@ -1,6 +1,6 @@
 var local = new Date();
 local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
-document.getElementById('month').value = local.toJSON().slice(0,7);
+document.getElementById('month').value = local.toJSON().slice(0, 7);
 
 var socket = io.connect(document.location.href);
 var form = document.getElementById('report-form');
@@ -15,11 +15,14 @@ function getFormData() {
 	var username = document.getElementById('username').value;
 	var position = document.getElementById('position').value;
 	var date = document.getElementById('month').value;
-	var projectRadioInputs = [].slice.call(document.getElementsByClassName('repositories'));
-	var repositoryList = projectRadioInputs.filter(input => input.checked)[0].value;
+	var projects = [].filter.call(document.getElementsByName('projects'), function(c) {
+		return c.checked;
+	}).map(function(c) {
+		return c.value;
+	});
 	return {
 		username: username,
-		repositories: repositoryList.split(','),
+		projects: projects,
 		position: position,
 		month: date
 	}
@@ -43,7 +46,7 @@ socket.on('report-file', function(event) {
 	a.click();
 });
 
-socket.on('progress', function (progress) {
+socket.on('progress', function(progress) {
 	setStatus((progress.value * 100) + '% ' + progress.state)
 });
 
