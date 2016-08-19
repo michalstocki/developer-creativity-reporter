@@ -8,6 +8,7 @@ form.addEventListener('submit', (event) => {
 	event.preventDefault();
 	var data = getFormData();
 	sendReportRequest(data);
+	document.getElementById('submit-form').disabled = true;
 }, false);
 
 
@@ -32,11 +33,13 @@ function sendReportRequest(data) {
 	socket.emit('get-report', data);
 }
 
-function setStatus(text) {
+function setStatus(text, progress) {
 	document.getElementById('status').textContent = text;
+	document.getElementById('progress-bar').style.width = progress + '%';
 }
 
 socket.on('report-file', function(event) {
+	document.getElementById('submit-form').disabled = false;
 	var blob = new Blob([event.buffer], {type: 'text/csv'});
 	var objectURL = URL.createObjectURL(blob);
 
@@ -47,10 +50,11 @@ socket.on('report-file', function(event) {
 });
 
 socket.on('progress', function(progress) {
-	setStatus(Math.round(progress.value * 100) + '% ' + progress.state)
+	setStatus(progress.state, Math.round(progress.value * 100))
 });
 
 socket.on('fail', function(error) {
+	document.getElementById('submit-form').disabled = false;
 	console.error(error.info);
 });
 

@@ -21,7 +21,10 @@ block content
         option(value='developer') Programista
         option(value='tester') Tester
         option(value='manager') Kierownik zespołu
-    input(type='submit', value='Rób')
+    input#submit-form(type='submit', value='Rób')
 
-    p Current status:
-      span#status  bezczynny
+    p Postęp:
+      div.progress
+        div#status  bezczynny
+        div.progress-bar-container
+          div#progress-bar

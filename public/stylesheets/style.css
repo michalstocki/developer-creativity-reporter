@@ -61,3 +61,19 @@ label.project input:checked + .avatar img {
 label.project input:checked + .avatar + .name {
   font-weight: bold;
 }
+
+.progress #status {
+	padding-bottom: 5px;
+}
+
+.progress .progress-bar-container {
+	width: 300px;
+	background-color: lightgrey;
+	height: 3px;
+}
+
+#progress-bar {
+	height: 3px;
+	background-color: darkblue;
+	width: 0;
+}
