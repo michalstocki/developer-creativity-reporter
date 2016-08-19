@@ -1,10 +1,9 @@
 const config = require('../config.json');
 const createBasicAuthHeader = require('basic-auth-header');
-const moment = require('moment');
 const fetch = require('node-fetch');
 
 module.exports.getFilteredPullRequests = function(repositoryName, filters) {
-	return fetchFilteredPullRequests(getPullRequestsAPIUrl(repositoryName), filters);
+	return fetchCollection(getPullRequestsAPIUrl(repositoryName, filters));
 };
 
 module.exports.getProjects = function() {
@@ -15,9 +14,13 @@ module.exports.getRepositoriesByProject = function(projectKey) {
 	return fetchCollection(getProjectRepositoriesAPIUrl(projectKey));
 };
 
-function getPullRequestsAPIUrl(repositoryName) {
+function getPullRequestsAPIUrl(repositoryName, filters) {
 	const teamName = config.bitbucket.team;
-	return `https://api.bitbucket.org/2.0/repositories/${teamName}/${repositoryName}/pullrequests?state=MERGED&state=OPEN`;
+	const fromTime = filters.period.from.toISOString().substr(0, 19);
+	const toTime = filters.period.to.toISOString().substr(0, 19);
+	const queryString = `author.username = "${filters.username}" AND created_on > ${fromTime} AND created_on < ${toTime}`;
+	const encodedQuery = encodeURIComponent(queryString);
+	return `https://api.bitbucket.org/2.0/repositories/${teamName}/${repositoryName}/pullrequests?state=MERGED&state=OPEN&q=${encodedQuery}`;
 }
 
 function getProjectsAPIUrl() {
@@ -35,13 +38,6 @@ function fetchCollection(apiURL) {
 		.then(responseObject => responseObject.values)
 }
 
-function fetchFilteredPullRequests(apiURL, filters) {
-	return fetchBitbucketAPI(apiURL)
-		.then(responseObject => loadNextPage(responseObject, filters))
-		.then(responseObject => responseObject.values)
-		.then(pullRequests => filterPullRequests(pullRequests, filters));
-}
-
 function fetchBitbucketAPI(bitbucketAPIURL) {
 	return fetch(bitbucketAPIURL, {
 		headers: {
@@ -50,34 +46,15 @@ function fetchBitbucketAPI(bitbucketAPIURL) {
 	}).then(checkResponseStatus);
 }
 
-function loadNextPage(responseObject, filters) {
+function loadNextPage(responseObject) {
 	let nextPageData = responseObject;
-	if (responseObject.next && canNextPageSatisfyFilter(responseObject, filters)) {
+	if (responseObject.next) {
 		nextPageData = fetchBitbucketAPI(responseObject.next).then(resObject => {
 			[].unshift.apply(resObject.values, responseObject.values);
-			return loadNextPage(resObject, filters);
+			return loadNextPage(resObject);
 		});
 	}
 	return nextPageData;
-}
-
-function canNextPageSatisfyFilter(pullRequestObject, filters) {
-	let result = true;
-	const lastResult = pullRequestObject.values[pullRequestObject.values.length - 1];
-	if (filters && filters.period && moment(lastResult.created_on).isBefore(filters.period.from)) {
-		result = false;
-	}
-	return result;
-}
-
-function filterPullRequests(pullRequests, filters) {
-	if (filters.username) {
-		pullRequests = filterPullRequestsByUser(pullRequests, filters.username);
-	}
-	if (filters.period) {
-		pullRequests = filterPullRequestsByPeriod(pullRequests, filters.period);
-	}
-	return pullRequests;
 }
 
 function checkResponseStatus(response) {
@@ -86,12 +63,4 @@ function checkResponseStatus(response) {
 	} else {
 		return Promise.reject(`Status ${response.status} (${response.statusText})`);
 	}
-}
-
-function filterPullRequestsByUser(pullRequests, username) {
-	return pullRequests.filter((pullRequest) => pullRequest.author.username === username);
-}
-
-function filterPullRequestsByPeriod(pullRequests, period) {
-	return pullRequests.filter(pullRequest => moment(pullRequest.created_on).isBetween(period.from, period.to));
 }
