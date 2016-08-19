@@ -9,9 +9,9 @@ module.exports.generateCSVReportContents = function(inputData, pullRequests) {
 
 	return getUserInfo(inputData, pullRequests).then((user) => {
 		const period = {
-			monthName: moment().format('MMMM'),
-			month: moment().format('MM'),
-			year: moment().format('YYYY')
+			monthName: moment(inputData.month, 'YYYY-MM').format('MMMM'),
+			month: moment(inputData.month, 'YYYY-MM').format('MM'),
+			year: moment(inputData.month, 'YYYY-MM').format('YYYY')
 		};
 		return header.getReportHeader(period, user) +
 			body.getReportBody(period, user, pullRequests) +
