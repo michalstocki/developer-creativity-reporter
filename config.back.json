@@ -5,5 +5,13 @@
       "user": "username",
       "password": "password"
     }
+  },
+  "jira": {
+    "access": {
+      "host": "https://example.com",
+      "user": "username",
+      "password": "password"
+    },
+    "projectKey": "PRO"
   }
 }
