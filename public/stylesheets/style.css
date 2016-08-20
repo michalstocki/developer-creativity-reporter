@@ -77,3 +77,33 @@ label.project input:checked + .avatar + .name {
 	background-color: darkblue;
 	width: 0;
 }
+
+.issue {
+	padding: 5px;
+	width: 250px;
+	height: 80px;
+	border: 1px solid darkgrey;
+}
+
+.issue .props {
+	width: 20px;
+	float: left;
+	margin-right: 5px;
+}
+
+.issue .props .icon {
+	margin: 3px;
+}
+
+.issue .summary {
+}
+
+.issue .summary .key {
+	display: block;
+	margin: 3px;
+}
+
+.issue .summary .avatar {
+	float: right;
+	margin: 3px;
+}

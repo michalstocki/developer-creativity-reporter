@@ -23,6 +23,16 @@ block content
         option(value='manager') Kierownik zespołu
     input#submit-form(type='submit', value='Rób')
 
+    p Zadanie Jira gdzie może zostać umieszczony raport
+    div.issue
+      div.props
+        img.icon#issue-type
+        img.icon#issue-priority
+      div.summary
+        img.avatar#issue-assignee
+        span.key#issue-key
+        span.title#issue-title
+
     p Postęp:
       div.progress
         div#status  bezczynny

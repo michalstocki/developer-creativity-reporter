@@ -5,8 +5,11 @@ const fetch = require('node-fetch');
 
 module.exports.getLastUpdatedIssueAssignedTo = function(username) {
 	return fetchJiraAPI(getSearchIssueByAssigneeUrl(username)).then((response) => {
-		console.log('result:', JSON.stringify(response));
-		return response.issues[0];
+		if (response.issues.length > 0) {
+			return response.issues[0];
+		} else {
+			return Promise.reject('Cannot find a Jira issue for given username and project')
+		}
 	});
 };
 

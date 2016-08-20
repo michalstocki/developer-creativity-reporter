@@ -7,6 +7,7 @@ var form = document.getElementById('report-form');
 form.addEventListener('submit', (event) => {
 	event.preventDefault();
 	var data = getFormData();
+	sendIssueDetailsRequest(data);
 	sendReportRequest(data);
 	document.getElementById('submit-form').disabled = true;
 }, false);
@@ -31,6 +32,10 @@ function getFormData() {
 
 function sendReportRequest(data) {
 	socket.emit('get-report', data);
+}
+
+function sendIssueDetailsRequest(data) {
+	socket.emit('get-issue-details', data);
 }
 
 function setStatus(text, progress) {
@@ -60,4 +65,20 @@ socket.on('fail', function(error) {
 
 socket.on('warning', function(warn) {
 	console.warn(warn.info);
+});
+
+socket.on('issue-details', function(issue) {
+	const issueType = document.getElementById('issue-type');
+	issueType.src = issue.type.iconUrl;
+	issueType.title = issue.type.name;
+	const assignee = document.getElementById('issue-assignee');
+	assignee.src = issue.assignee.avatarUrl;
+	assignee.title = issue.assignee.displayName;
+	const issueTitle = document.getElementById('issue-title');
+	issueTitle.innerText = issue.summary;
+	const issueKey = document.getElementById('issue-key');
+	issueKey.innerText = issue.key;
+	const issuePriority = document.getElementById('issue-priority');
+	issuePriority.src = issue.priority.iconUrl;
+	issuePriority.title = issue.priority.name;
 });

@@ -1,6 +1,7 @@
 'use strict';
 
 const ForutnaReportGenerator = require('../main/fortuna-report-generator');
+const jiraClient = require('../main/jira/jira-api-client');
 
 module.exports = function(server) {
 
@@ -19,6 +20,30 @@ module.exports = function(server) {
 				socket.emit('fail', {info: error});
 			});
 		});
+		
+		socket.on('get-issue-details', function(data) {
+			console.log('get-issue-details received');
+			jiraClient.getLastUpdatedIssueAssignedTo(data.username).then((issue) => {
+				socket.emit('issue-details', {
+					key: issue.key,
+					summary: issue.fields.summary,
+					assignee: {
+						displayName: issue.fields.assignee.displayName,
+						avatarUrl: issue.fields.assignee.avatarUrls['32x32']
+					},
+					type: {
+						name: issue.fields.issuetype.name,
+						iconUrl: issue.fields.issuetype.iconUrl
+					},
+					priority: {
+						name: issue.fields.priority.name,
+						iconUrl: issue.fields.priority.iconUrl
+					}
+				})
+			}).catch((error) => {
+				console.log('Issue Error:', error);
+			});
+		})
 	});
 
 };
